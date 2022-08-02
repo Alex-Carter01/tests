@@ -181,3 +181,14 @@ if [ "$TEE_TYPE" == "tdx" ]; then
 			;;
         esac
 fi
+
+if [ "$TEE_TYPE" == "sev" ]; then
+        echo "Use sev enabled guest config in ${runtime_config_path}"
+		#this will use configuration.toml.. is it worth copying to configuration-cc.toml like kata-deploy?
+		sed -E \
+			-e 's#^image = .+#initrd = "/opt/kata/share/kata-containers/kata-containers-initrd.img"#' \
+			-e 's#^(kernel_params = .+)"#\1 agent.config_file=/etc/kata-containers/agent.toml"#' \
+			-e 's#.*service_offload = .+#service_offload = true#' \
+			"/opt/kata/share/defaults/kata-containers/configuration-qemu.toml" > \
+			"/opt/kata/share/defaults/kata-containers/configuration-cc.toml"
+fi
